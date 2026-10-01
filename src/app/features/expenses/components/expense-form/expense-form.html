@@ -1,0 +1,71 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="expense-form" novalidate>
+  <mat-form-field appearance="outline" class="expense-form__full">
+    <mat-label>Descrição</mat-label>
+    <input matInput formControlName="description" autocomplete="off" />
+    <mat-hint align="end">
+      {{ form.controls.description.value.length }}/{{ descriptionMaxLength }}
+    </mat-hint>
+    <!-- @if / @else if: mostra apenas UMA mensagem por vez, na ordem de prioridade. -->
+    @if (form.controls.description.hasError('required')) {
+      <mat-error>Informe a descrição.</mat-error>
+    } @else if (form.controls.description.hasError('blank')) {
+      <mat-error>A descrição não pode conter apenas espaços.</mat-error>
+    } @else if (form.controls.description.hasError('maxlength')) {
+      <mat-error>Use no máximo {{ descriptionMaxLength }} caracteres.</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Categoria</mat-label>
+    <mat-select formControlName="category">
+      <!-- @for exige "track": identifica cada item para o Angular reaproveitar o DOM. -->
+      @for (category of categories; track category) {
+        <mat-option [value]="category">
+          <mat-icon>{{ categoryMeta[category].icon }}</mat-icon>
+          {{ categoryMeta[category].label }}
+        </mat-option>
+      }
+    </mat-select>
+    @if (form.controls.category.hasError('required')) {
+      <mat-error>Selecione uma categoria.</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Valor</mat-label>
+    <span matTextPrefix>R$&nbsp;</span>
+    <input matInput type="number" inputmode="decimal" step="0.01" min="0" formControlName="value" />
+    @if (form.controls.value.hasError('required')) {
+      <mat-error>Informe o valor.</mat-error>
+    } @else if (form.controls.value.hasError('positive')) {
+      <mat-error>O valor deve ser maior que zero.</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Data</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="date" placeholder="dd/mm/aaaa" />
+    <mat-datepicker-toggle matIconSuffix [for]="picker" />
+    <mat-datepicker #picker />
+    @if (form.controls.date.hasError('required')) {
+      <mat-error>Informe uma data válida.</mat-error>
+    }
+  </mat-form-field>
+
+  <div class="expense-form__type">
+    <span class="expense-form__label" id="expense-type-label">Tipo</span>
+    <mat-button-toggle-group formControlName="type" aria-labelledby="expense-type-label">
+      @for (type of types; track type) {
+        <mat-button-toggle [value]="type">{{ typeLabels[type] }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="expense-form__actions">
+    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">
+      <mat-icon>check</mat-icon>
+      {{ saving() ? 'Salvando...' : 'Salvar' }}
+    </button>
+  </div>
+</form>

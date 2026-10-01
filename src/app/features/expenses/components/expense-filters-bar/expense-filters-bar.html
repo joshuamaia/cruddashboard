@@ -1,0 +1,40 @@
+<div class="filters">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__search">
+    <mat-label>Pesquisar</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input
+      matInput
+      type="search"
+      placeholder="Descrição da despesa"
+      [value]="filters().search"
+      (input)="onSearch($event)"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Categoria</mat-label>
+    <mat-select [value]="filters().category" (selectionChange)="onCategory($event.value)">
+      <mat-option [value]="null">Todas</mat-option>
+      @for (category of categories; track category) {
+        <mat-option [value]="category">{{ categoryMeta[category].label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Período</mat-label>
+    <mat-date-range-input [rangePicker]="rangePicker">
+      <input matStartDate placeholder="Início" [value]="startDate()" (dateChange)="onStartDate($event.value)" />
+      <input matEndDate placeholder="Fim" [value]="endDate()" (dateChange)="onEndDate($event.value)" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker" />
+    <mat-date-range-picker #rangePicker />
+  </mat-form-field>
+
+  @if (hasActiveFilters()) {
+    <button mat-button type="button" (click)="clear.emit()">
+      <mat-icon>filter_alt_off</mat-icon>
+      Limpar filtros
+    </button>
+  }
+</div>

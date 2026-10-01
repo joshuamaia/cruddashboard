@@ -1,0 +1,67 @@
+<app-page-header title="Dashboard" subtitle="Resumo e evolução dos seus gastos.">
+  <a mat-stroked-button routerLink="/expenses/new">
+    <mat-icon>add</mat-icon>
+    Nova despesa
+  </a>
+</app-page-header>
+
+@switch (store.status()) {
+  @case ('error') {
+    <app-empty-state
+      icon="cloud_off"
+      title="Não foi possível carregar os dados"
+      message="Tente novamente em instantes."
+    >
+      <button mat-stroked-button (click)="store.load()">Tentar novamente</button>
+    </app-empty-state>
+  }
+
+  @case ('loaded') {
+    @if (store.count() > 0) {
+      <section class="stats" aria-label="Indicadores">
+        <app-stat-card label="Total gasto" icon="payments" [value]="store.total() | currency: 'BRL'" />
+        <app-stat-card label="Quantidade de despesas" icon="receipt_long" [value]="store.count() | number" />
+
+        <!-- highest() é `Expense | null`: o "as" entrega a variável já sem null. -->
+        @if (store.highest(); as highest) {
+          <app-stat-card
+            label="Maior despesa"
+            icon="trending_up"
+            [value]="highest.value | currency: 'BRL'"
+            [hint]="highest.description"
+          />
+        }
+
+        <app-stat-card label="Média por despesa" icon="functions" [value]="store.average() | currency: 'BRL'" />
+      </section>
+
+      <section class="charts">
+        <app-chart-card title="Distribuição por categoria" subtitle="Participação de cada categoria no total gasto">
+          <app-category-doughnut-chart [totals]="store.totalsByCategory()" />
+        </app-chart-card>
+
+        <app-chart-card title="Total por categoria" subtitle="Valor acumulado em cada categoria">
+          <app-category-bar-chart [totals]="store.totalsByCategory()" />
+        </app-chart-card>
+
+        <app-chart-card class="charts__wide" title="Evolução mensal" subtitle="Total gasto em cada mês">
+          <app-monthly-line-chart [totals]="store.totalsByMonth()" />
+        </app-chart-card>
+      </section>
+    } @else {
+      <app-empty-state
+        icon="insights"
+        title="Ainda não há dados para exibir"
+        message="Cadastre despesas para ver indicadores e gráficos."
+      >
+        <a mat-flat-button routerLink="/expenses/new">Cadastrar despesa</a>
+      </app-empty-state>
+    }
+  }
+
+  @default {
+    <div class="loading">
+      <mat-spinner diameter="48" />
+    </div>
+  }
+}

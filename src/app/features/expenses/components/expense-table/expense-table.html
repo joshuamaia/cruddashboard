@@ -1,0 +1,54 @@
+<div class="table-wrapper">
+  <table class="expense-table">
+    <thead>
+      <tr>
+        <th scope="col">Data</th>
+        <th scope="col">Descrição</th>
+        <th scope="col">Categoria</th>
+        <th scope="col">Tipo</th>
+        <th scope="col" class="expense-table__number">Valor</th>
+        <th scope="col" class="expense-table__actions"><span class="visually-hidden">Ações</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--
+        @for + track expense.id: quando a lista muda (filtro, exclusão), o
+        Angular usa o id para saber qual linha manter, mover ou remover, em vez
+        de recriar todo o DOM.
+        @empty: renderizado automaticamente quando a coleção está vazia.
+      -->
+      @for (expense of expenses(); track expense.id) {
+        <tr>
+          <td class="expense-table__date">{{ expense.date | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ expense.description }}</td>
+          <td>
+            <span class="category">
+              <span class="category__swatch" [style.background]="categoryMeta[expense.category].color"></span>
+              {{ categoryMeta[expense.category].label }}
+            </span>
+          </td>
+          <td>
+            <span class="type-badge" [class.type-badge--fixed]="expense.type === 'FIXA'">
+              {{ typeLabels[expense.type] }}
+            </span>
+          </td>
+          <td class="expense-table__number">{{ expense.value | currency: 'BRL' }}</td>
+          <td class="expense-table__actions">
+            <button mat-icon-button matTooltip="Editar" (click)="edit.emit(expense)" [attr.aria-label]="'Editar ' + expense.description">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Excluir" (click)="remove.emit(expense)" [attr.aria-label]="'Excluir ' + expense.description">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="expense-table__empty">
+            Nenhuma despesa encontrada para os filtros aplicados.
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

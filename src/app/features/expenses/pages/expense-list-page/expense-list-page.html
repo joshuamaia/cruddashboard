@@ -1,0 +1,60 @@
+<app-page-header title="Despesas" subtitle="Cadastre, pesquise e gerencie seus gastos.">
+  <a mat-flat-button routerLink="/expenses/new">
+    <mat-icon>add</mat-icon>
+    Nova despesa
+  </a>
+</app-page-header>
+
+<!--
+  @switch: um valor com VÁRIOS estados mutuamente exclusivos (LoadStatus).
+  É mais legível que uma cadeia de @if/@else if comparando o mesmo valor.
+-->
+@switch (store.status()) {
+  @case ('error') {
+    <app-empty-state
+      icon="cloud_off"
+      title="Não foi possível carregar as despesas"
+      message="Verifique sua conexão e tente novamente."
+    >
+      <button mat-stroked-button (click)="store.load()">Tentar novamente</button>
+    </app-empty-state>
+  }
+
+  @case ('loaded') {
+    <!-- @if/@else: "não existe nenhuma despesa" é diferente de "o filtro não encontrou nada". -->
+    @if (store.count() > 0) {
+      <app-expense-filters-bar
+        [filters]="store.filters()"
+        [hasActiveFilters]="store.hasActiveFilters()"
+        (filtersChange)="store.patchFilters($event)"
+        (clear)="store.clearFilters()"
+      />
+
+      <p class="summary">
+        Exibindo <strong>{{ store.filteredExpenses().length }}</strong> de {{ store.count() }} despesas
+        · Total: <strong>{{ store.filteredTotal() | currency: 'BRL' }}</strong>
+      </p>
+
+      <app-expense-table
+        [expenses]="store.filteredExpenses()"
+        (edit)="edit($event)"
+        (remove)="remove($event)"
+      />
+    } @else {
+      <app-empty-state
+        icon="receipt_long"
+        title="Nenhuma despesa cadastrada"
+        message="Comece registrando o seu primeiro gasto."
+      >
+        <a mat-flat-button routerLink="/expenses/new">Cadastrar despesa</a>
+      </app-empty-state>
+    }
+  }
+
+  <!-- @default cobre 'idle' e 'loading'. -->
+  @default {
+    <div class="loading">
+      <mat-spinner diameter="48" />
+    </div>
+  }
+}

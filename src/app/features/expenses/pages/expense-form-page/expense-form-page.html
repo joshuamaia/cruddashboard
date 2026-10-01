@@ -1,0 +1,26 @@
+<app-page-header
+  [title]="isEditMode() ? 'Editar despesa' : 'Nova despesa'"
+  [subtitle]="isEditMode() ? 'Altere os dados e salve.' : 'Preencha os dados do gasto.'"
+/>
+
+<!-- Cadeia @if / @else if / @else: estados com condições DIFERENTES entre si. -->
+@if (isLoading()) {
+  <div class="loading">
+    <mat-spinner diameter="48" />
+  </div>
+} @else if (notFound()) {
+  <app-empty-state
+    icon="search_off"
+    title="Despesa não encontrada"
+    message="Ela pode ter sido excluída."
+  >
+    <a mat-flat-button routerLink="/expenses">Voltar para a listagem</a>
+  </app-empty-state>
+} @else {
+  <app-expense-form
+    [expense]="expense()"
+    [saving]="saving()"
+    (save)="save($event)"
+    (cancel)="cancel()"
+  />
+}

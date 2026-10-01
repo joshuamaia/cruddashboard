@@ -1,0 +1,24 @@
+<mat-toolbar class="app-toolbar">
+  <a class="app-brand" routerLink="/">
+    <mat-icon>account_balance_wallet</mat-icon>
+    <span class="app-title">Expense Dashboard</span>
+  </a>
+
+  <nav class="app-nav" aria-label="Navegação principal">
+    @for (link of navLinks; track link.path) {
+      <a
+        mat-button
+        [routerLink]="link.path"
+        routerLinkActive="app-nav__link--active"
+        ariaCurrentWhenActive="page"
+      >
+        <mat-icon>{{ link.icon }}</mat-icon>
+        {{ link.label }}
+      </a>
+    }
+  </nav>
+</mat-toolbar>
+
+<main class="app-content">
+  <router-outlet />
+</main>
